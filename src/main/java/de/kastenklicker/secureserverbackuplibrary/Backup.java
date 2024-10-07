@@ -37,7 +37,7 @@ public class Backup {
     }
 
     /**
-     * Get all files which weren't found.
+     * Get all files which shouldn't be included, but an error IOException occurred.
      * @return Missing files list
      */
     public List<String> getMissingFiles() {

@@ -8,6 +8,7 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,7 +73,9 @@ public class FTPSClientTest {
         // Check if file was transferred correctly
         File testFileUpload = new File("./src/test/resources/testUpload.txt");
         ftpsContainer.copyFileFromContainer(REMOTE_DIRECTORY + "/test.txt", testFileUpload.getPath());
-        assertEquals(testFile.length(), testFileUpload.length());
+        assertEquals(-1L,
+                Files.mismatch(testFile.toPath(), testFileUpload.toPath()),
+                "Uploaded and Download files are not the same");
         assertTrue(testFileUpload.delete());
     }
 

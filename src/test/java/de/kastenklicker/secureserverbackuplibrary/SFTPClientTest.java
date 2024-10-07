@@ -11,9 +11,9 @@ import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SFTPClientTest {
 
@@ -59,13 +59,16 @@ public class SFTPClientTest {
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
                 authentication, publicHostKey, timeout, remoteDirectory);
 
-        sftpClient.upload(
-                new File("./src/test/resources/zipTest/test.txt"));
+        File testFile = new File("./src/test/resources/zipTest/test.txt");
+        sftpClient.upload(testFile);
         
         // Check if file was transferred correctly
-        File testFile = new File("./src/test/resources/testUpload.txt");
-        sftpContainer.copyFileFromContainer("/home/foo/upload/test.txt", testFile.getPath());
-        assertTrue(testFile.delete());
+        File testFileUpload = new File("./src/test/resources/testUpload.txt");
+        sftpContainer.copyFileFromContainer("/home/foo/upload/test.txt", testFileUpload.getPath());
+        assertEquals(-1L,
+                Files.mismatch(testFile.toPath(), testFileUpload.toPath()),
+                "Uploaded and Download files are not the same");
+        assertTrue(testFileUpload.delete());
     }
     
     @Test
@@ -77,13 +80,16 @@ public class SFTPClientTest {
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
                 authentication, publicHostKey, timeout, remoteDirectory);
 
-        sftpClient.upload(
-                new File("./src/test/resources/zipTest/test.txt"));
+        File testFile = new File("./src/test/resources/zipTest/test.txt");
+        sftpClient.upload(testFile);
 
         // Check if file was transferred correctly
-        File testFile = new File("./src/test/resources/testUpload.txt");
-        sftpContainer.copyFileFromContainer("/home/foo/upload/test.txt", testFile.getPath());
-        assertTrue(testFile.delete());
+        File testFileUpload = new File("./src/test/resources/testUpload.txt");
+        sftpContainer.copyFileFromContainer("/home/foo/upload/test.txt", testFileUpload.getPath());
+        assertEquals(-1L,
+                Files.mismatch(testFile.toPath(), testFileUpload.toPath()),
+                "Uploaded and Download files are not the same");
+        assertTrue(testFileUpload.delete());
     }
 
     @Test

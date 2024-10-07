@@ -11,10 +11,10 @@ import org.testcontainers.utility.MountableFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BackupTest {
 
@@ -71,7 +71,7 @@ public class BackupTest {
                 publicHostKey, 
                 20000,
                 "/upload");
-
+        
         File backup = new Backup(
                 new ArrayList<>(),
                 backupsDirectory,
@@ -89,6 +89,7 @@ public class BackupTest {
         // Check if file was transferred correctly
         File backupUpload = new File("./src/test/resources/" + backup.getName());
         sftpContainer.copyFileFromContainer("/home/foo/upload/" + backup.getName(), backupUpload.getPath());
+        assertEquals(-1L, Files.mismatch(backup.toPath(), backupUpload.toPath()));
         assertTrue(backupUpload.delete());
     }
 
