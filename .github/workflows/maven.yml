@@ -29,19 +29,3 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn test -B package --file pom.xml
-
-  generate_plantuml:
-      runs-on: ubuntu-latest
-      name: plantuml
-      steps:
-      - name: checkout
-        uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
-      - name: plantuml
-        id: plantuml
-        uses: kolchurinvv/generate-plantuml-action@master
-        with:
-          message: "Render PlantUML files"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
