@@ -1,6 +1,10 @@
 # SecureServerBackupLibrary
 This is the library for the paper server plugin [SecureServerPlugin](https://github.com/KastenKlicker/SecureServerBackup).
 
+# Contributing
+If you like to add another upload method, create a new class extending the abstract UploadClient class.
+![UMLish Diagram of this Library](https://github.com/KastenKlicker/SecureServerBackupLibrary/blob/main/doc/Backup.png)
+
 # Licence informations for used libraries:
 
 jsch: BSD-3-Clause<br>
