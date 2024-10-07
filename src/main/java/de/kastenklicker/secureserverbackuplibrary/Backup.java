@@ -3,6 +3,7 @@ package de.kastenklicker.secureserverbackuplibrary;
 import de.kastenklicker.secureserverbackuplibrary.upload.UploadClient;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,27 +15,31 @@ public class Backup {
 
     private final List<String> excludeFiles;
     private final File backupDirectory;
-    private final File mainDirectory;
+    private final File serverDirectory;
     private final UploadClient uploadClient;
     private List<String> missingFiles = new ArrayList<>();
     private final long maxBackupDirectorySize;
 
     /**
-     * Class for containing all backup logic
+     * Class for containing all backup logic.
      * @param excludeFiles files which should be excluded from the backup
      * @param backupDirectory the directory of the backups
-     * @param mainDirectory the directory which contains all server files
+     * @param serverDirectory the directory which contains all server files
      * @param uploadClient the specific class of the Upload protocol
      * @param maxBackupDirectorySize the maximum size of the backup directory
      */
-    public Backup(List<String> excludeFiles, File backupDirectory, File mainDirectory, UploadClient uploadClient, long maxBackupDirectorySize) {
+    public Backup(List<String> excludeFiles, File backupDirectory, File serverDirectory, UploadClient uploadClient, long maxBackupDirectorySize) {
         this.excludeFiles = excludeFiles;
         this.backupDirectory = backupDirectory;
-        this.mainDirectory = mainDirectory;
+        this.serverDirectory = serverDirectory;
         this.uploadClient = uploadClient;
         this.maxBackupDirectorySize = maxBackupDirectorySize;
     }
 
+    /**
+     * Get all files which shouldn't be included, but an error IOException occurred.
+     * @return Missing files list
+     */
     public List<String> getMissingFiles() {
         return missingFiles;
     }
@@ -54,17 +59,17 @@ public class Backup {
         excludeFiles.add("world_nether/session.lock");
         excludeFiles.add("world_the_end/session.lock");
 
-        // Create backup file
-        // With current local time
+        // Get current time for backup file name
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
         LocalDateTime localDateTime = LocalDateTime.now();
         String currentTime = dateTimeFormatter.format(localDateTime);
 
+        // Create backup zip file
         File backupFile = new File(backupDirectory, "backup-"+currentTime+".zip");
 
         // Compress the server files
-        Zip zip = new Zip(backupFile, mainDirectory, excludeFiles);
-        zip.zip(mainDirectory);
+        Zip zip = new Zip(backupFile, serverDirectory, excludeFiles);
+        zip.zip(serverDirectory);
         zip.finish();
         missingFiles = zip.getMissingFiles();
 
@@ -73,7 +78,10 @@ public class Backup {
 
         // Delete oldest file if over limit
         while (isOldestFileMarkedToBeDeleted()) {
-            ArrayList<File> files = new ArrayList<>(Arrays.asList(backupDirectory.listFiles()));
+            File[] fileArray = backupDirectory.listFiles();
+            if (fileArray == null)
+                throw new FileNotFoundException(backupDirectory + " isn't a directory!");
+            ArrayList<File> files = new ArrayList<>(Arrays.asList(fileArray));
             files.sort(Comparator.comparing(File::lastModified));
             File oldestFile = files.getFirst();
             if (!oldestFile.delete()) {

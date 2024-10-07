@@ -10,11 +10,31 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Properties;
 
+/**
+ * Class for uploading backup with SFTP.
+ */
 public class SFTPClient extends UploadClient{
+    
+    private final File publicHostKeyFile;
+    private final int timeout;
 
+    /**
+     * Creates the SFTP Client.
+     * @param hostname Hostname/Domain/IP Address of remote server.
+     * @param port Port of remote server.
+     * @param username Username of remote user.
+     * @param authentication Authentication either password or file path to unlocked private RSA key.
+     * @param publicHostKeyFile Public host key or knownHosts file.
+     *                          If file doesn't exist, the key will be received from the server and saved to the file.
+     * @param timeout Session timeout in milliseconds.
+     * @param remoteDirectory The directory of the remote server.
+     */
     public SFTPClient(String hostname, int port, String username, String authentication,
-                      String hostKey, int timeout, String remoteDirectory) {
-        super(hostname, port, username, authentication, hostKey, timeout, remoteDirectory);
+                      File publicHostKeyFile, int timeout, String remoteDirectory) {
+        super(hostname, port, username, authentication, remoteDirectory);
+        
+        this.publicHostKeyFile = publicHostKeyFile;
+        this.timeout = timeout;
     }
 
     /**
@@ -28,10 +48,8 @@ public class SFTPClient extends UploadClient{
             throws JSchException, SftpException, IOException {
         JSch jsch = new JSch();
         
-        File hostKeyFile = new File(knownHosts);
-        
         // Scan for Host Key if file doesn't exist
-        if (!hostKeyFile.exists()) {
+        if (!publicHostKeyFile.exists()) {
 
             // Get host key
             Properties config = new Properties();
@@ -47,17 +65,17 @@ public class SFTPClient extends UploadClient{
             HostKey hostkey = scanSession.getHostKey();
 
             // Write host key to file
-            BufferedWriter writer = new BufferedWriter(new FileWriter(hostKeyFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(publicHostKeyFile));
             writer.write(hostkey.getType() + " " + hostkey.getKey() + " " + hostkey.getComment());
             writer.close();
         }
         
         // Check if the given String is the knownHosts file or a HostKey
-        String hostKeyFileName = hostKeyFile.getName();
+        String hostKeyFileName = publicHostKeyFile.getName();
         if (hostKeyFileName.length() >= 4 &&    // File ist a public HostKey
                 hostKeyFileName.substring(hostKeyFileName.length() - 4).equalsIgnoreCase(".pub")) {
             // Add public hostKey            
-            String keyString = Files.readString(hostKeyFile.toPath()).trim();
+            String keyString = Files.readString(publicHostKeyFile.toPath()).trim();
             
             // Get just the Base64 part
             String[] hostKeyParts = keyString.split(" ");
@@ -73,7 +91,7 @@ public class SFTPClient extends UploadClient{
             jsch.getHostKeyRepository().add(hostKey, null);
         }    
         else {  // File is a knownHosts file
-            jsch.setKnownHosts(knownHosts);
+            jsch.setKnownHosts(publicHostKeyFile.getPath());
         }
             
         

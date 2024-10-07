@@ -18,17 +18,24 @@ public class Zip {
     private final ZipOutputStream zipOutputStream;
     private final FileOutputStream fileOutputStream;
     private final List<String> excludeFiles;
-    private final File mainDirectory;
+    private final File serverDirectory;
     private final List<String> missingFiles = new ArrayList<>();
 
-    public Zip(File backupFile, File mainDirectory , List<String> excludeFiles)
+    /**
+     * The constructor for the backup zip file.
+     * @param backupFile The zip file.
+     * @param serverDirectory The directory where the server.jar is located.
+     * @param excludeFiles List of files which should be excluded.
+     * @throws FileNotFoundException Thrown if file is a directory or can't be accessed/created.
+     */
+    public Zip(File backupFile, File serverDirectory , List<String> excludeFiles)
             throws FileNotFoundException {
-        this.mainDirectory = mainDirectory;
+        this.serverDirectory = serverDirectory;
 
         // Get unique path for every excluded file
         this.excludeFiles = excludeFiles.stream().map(path -> {
                     try {
-                        return new File(mainDirectory, path).getCanonicalPath();
+                        return new File(serverDirectory, path).getCanonicalPath();
                     } catch (IOException e) {
                         missingFiles.add(path);
                         return null;
@@ -44,7 +51,7 @@ public class Zip {
     }
 
     /**
-     * Get all files which weren't found.
+     * Get all files which shouldn't be included, but an error IOException occurred.
      * @return Missing files list
      */
     public List<String> getMissingFiles() {
@@ -52,7 +59,7 @@ public class Zip {
     }
 
     /**
-     * Internal helper file to zip file and directories recursive.
+     * Zip files and directories recursive.
      * @param file file to add
      * @throws IOException Exceptions handled by the ExceptionListener
      */
@@ -77,7 +84,7 @@ public class Zip {
             // File is a real file, so add it
             // Add Entry
             ZipEntry zipEntry = new ZipEntry(file.getAbsolutePath()
-                    .replace(mainDirectory.getAbsolutePath(), "").substring(1));
+                    .replace(serverDirectory.getAbsolutePath(), "").substring(1));
 
             zipOutputStream.putNextEntry(zipEntry);
 
