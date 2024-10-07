@@ -57,7 +57,7 @@ public class SFTPClientTest {
     public void testUpload() throws JSchException, SftpException, IOException {
 
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
-                authentication, publicHostKey.getPath(), timeout, remoteDirectory);
+                authentication, publicHostKey, timeout, remoteDirectory);
 
         sftpClient.upload(
                 new File("./src/test/resources/zipTest/test.txt"));
@@ -75,7 +75,7 @@ public class SFTPClientTest {
             throw new RuntimeException("Couldn't run test, because publicHostKey file couldn't be deleted");
         
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
-                authentication, publicHostKey.getPath(), timeout, remoteDirectory);
+                authentication, publicHostKey, timeout, remoteDirectory);
 
         sftpClient.upload(
                 new File("./src/test/resources/zipTest/test.txt"));
@@ -90,7 +90,7 @@ public class SFTPClientTest {
     public void testUploadWrongDirectory() {
 
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
-                authentication, publicHostKey.getPath(), timeout,  remoteDirectory + "/sus/kek");
+                authentication, publicHostKey, timeout,  remoteDirectory + "/sus/kek");
 
         Exception exception = assertThrows(SftpException.class, () ->
                 sftpClient.upload(

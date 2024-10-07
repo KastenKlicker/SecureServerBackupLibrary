@@ -14,10 +14,21 @@ import java.io.FileInputStream;
 import java.net.Socket;
 import java.security.*;
 
+/**
+ * Class for uploading backup with FTPS.
+ */
 public class FTPSClient extends UploadClient {
 
-    public FTPSClient(String hostname, int port, String username, String authentication, String knownHosts, int timeout, String remoteDirectory) {
-        super(hostname, port, username, authentication, knownHosts, timeout, remoteDirectory);
+    /**
+     * Creates the FTPS Client.
+     * @param hostname Hostname/Domain/IP Address of remote server.
+     * @param port Port of remote server.
+     * @param username Username of remote user.
+     * @param authentication Authentication either password or file path to unlocked private RSA key.
+     * @param remoteDirectory The directory of the remote server.
+     */
+    public FTPSClient(String hostname, int port, String username, String authentication, String remoteDirectory) {
+        super(hostname, port, username, authentication, remoteDirectory);
     }
 
     /**
@@ -71,7 +82,9 @@ public class FTPSClient extends UploadClient {
             try {
                 // doesn't work with TLSv1.3
                 SSLContext sslContext = SSLContext.getInstance("TLSv1.2", "BCJSSE");
-                sslContext.init(null, new TrustManager[]{TrustManagerUtils.getValidateServerCertificateTrustManager()}, new SecureRandom()); // 1
+                sslContext.init(null,
+                        new TrustManager[]{TrustManagerUtils.getValidateServerCertificateTrustManager()},
+                        new SecureRandom()); // 1
                 return sslContext;
             } catch (NoSuchAlgorithmException | NoSuchProviderException | KeyManagementException e) {
                 throw new RuntimeException("Cannot create SSL context.", e);

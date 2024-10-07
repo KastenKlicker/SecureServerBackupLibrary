@@ -2,7 +2,6 @@ package de.kastenklicker.secureserverbackuplibrary;
 
 import de.kastenklicker.secureserverbackuplibrary.upload.NullUploadClient;
 import de.kastenklicker.secureserverbackuplibrary.upload.SFTPClient;
-import de.kastenklicker.secureserverbackuplibrary.upload.UploadClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
@@ -63,11 +63,12 @@ public class BackupTest {
         sftpContainer.start();
         
         // The real testing
-        UploadClient uploadClient = new SFTPClient(
-                sftpContainer.getHost(), sftpContainer.getMappedPort(22), 
+        SFTPClient uploadClient = new SFTPClient(
+                sftpContainer.getHost(),
+                sftpContainer.getMappedPort(22), 
                 "foo",
                 "pass",
-                publicHostKey.getPath(), 
+                publicHostKey, 
                 20000,
                 "/upload");
 
@@ -120,7 +121,11 @@ public class BackupTest {
     }
 
     @AfterEach
-    public void cleanUp() {
+    public void cleanUp() throws FileNotFoundException {
+        
+        if (backupsDirectory.listFiles() == null)
+            throw new FileNotFoundException(backupsDirectory + " is not a directory.");
+        
         for (File file : backupsDirectory.listFiles()) {
             file.delete();
         }

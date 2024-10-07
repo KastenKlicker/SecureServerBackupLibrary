@@ -64,7 +64,7 @@ public class FTPSClientTest {
     public void testUpload() throws Exception {
         
         final FTPSClient ftpsClient = new FTPSClient(hostname, port, USERNAME,
-                AUTHENTICATION, null, 0, REMOTE_DIRECTORY);
+                AUTHENTICATION, REMOTE_DIRECTORY);
         
         File testFile = new File("./src/test/resources/zipTest/test.txt");
          ftpsClient.upload(testFile);

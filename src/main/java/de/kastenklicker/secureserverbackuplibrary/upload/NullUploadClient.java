@@ -2,10 +2,13 @@ package de.kastenklicker.secureserverbackuplibrary.upload;
 
 import java.io.File;
 
-public class NullUploadClient extends UploadClient{
+/**
+ * Null Object class, if backup is disabled.
+ */
+public class NullUploadClient extends UploadClient {
 
     public NullUploadClient() {
-        super(null, 0, null, null, null, 0, null);
+        super(null, 0, null, null, null);
     }
 
     @Override
