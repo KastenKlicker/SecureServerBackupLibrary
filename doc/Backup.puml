@@ -1,7 +1,7 @@
 @startuml
 left to right direction
 
-class .upload.FTPSClient {
+class upload.FTPSClient {
 --
 +   FTPSClient(String hostname, int port, String authentication, String remoteDirectory) 
 +  upload(File)  : void
@@ -21,7 +21,7 @@ class upload.UploadClient {
 
 }
 
-class .upload.NullUploadClient {
+class upload.NullUploadClient {
 --
 +   NullUploadClient() 
 +  upload(File)  : void
@@ -49,10 +49,10 @@ class upload.SFTPClient {
 }
 
 ' Relations 
-.Backup "1"  o-left-  "1" .upload.UploadClient  : uploadClient: UploadClient
-.upload.NullUploadClient  -up|>  .upload.UploadClient
-.upload.SFTPClient  -up|>  .upload.UploadClient
-.upload.FTPSClient  -up|>  .upload.UploadClient
+Backup o-left- upload.UploadClient
+upload.NullUploadClient  -up|>  upload.UploadClient
+upload.SFTPClient  -up|>  upload.UploadClient
+upload.FTPSClient  -up|> .upload.UploadClient
 
 
 @enduml
