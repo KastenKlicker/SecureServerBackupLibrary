@@ -1,0 +1,58 @@
+@startuml
+left to right direction
+
+class .upload.FTPSClient {
+--
++   FTPSClient(String hostname, int port, String authentication, String remoteDirectory) 
++  upload(File)  : void
+
+}
+class upload.UploadClient {
+#  authentication : String
+#  hostname : String
+#  knownHosts : String
+#  port : int
+#  remoteDirectory : String
+#  timeout : int
+#  username : String
+--
++   UploadClient(String hostname, int port, String authentication, String remoteDirectory)
++  upload(File)  : void
+
+}
+
+class .upload.NullUploadClient {
+--
++   NullUploadClient() 
++  upload(File)  : void
+
+}
+class Backup {
+-  backupDirectory : File
+-  excludeFiles :  List< String>
+-  mainDirectory : File
+-  maxBackupDirectorySize : long
+-  missingFiles :  List< String>
+-  uploadClient : UploadClient
+--
++   Backup( List< String>, File, File, UploadClient, long) 
++  backup()  :  File
++  getMissingFiles()  :  List
+-  isOldestFileMarkedToBeDeleted()  : boolean
+
+}
+class upload.SFTPClient {
+--
++   SFTPClient(String hostname, int port, String authentication, File publicHostKeyFile, int timeout , String remoteDirectory)
++  upload(File)  : void
+
+}
+
+' Relations 
+.Backup "1"  o-left-  "1" .upload.UploadClient  : uploadClient: UploadClient
+.upload.NullUploadClient  -up|>  .upload.UploadClient
+.upload.SFTPClient  -up|>  .upload.UploadClient
+.upload.FTPSClient  -up|>  .upload.UploadClient
+
+
+@enduml
