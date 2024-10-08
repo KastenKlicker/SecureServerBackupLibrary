@@ -29,6 +29,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/KastenKlicker/SecureServerBackupLibrary</connection>
+        <url>https://github.com/KastenKlicker/SecureServerBackupLibrary/tree/main</url>
     </scm>
 
     <properties>
