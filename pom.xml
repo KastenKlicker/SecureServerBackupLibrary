@@ -7,16 +7,30 @@
     <groupId>de.kastenklicker</groupId>
     <artifactId>SecureServerBackupLibrary</artifactId>
     <version>1.0.0</version>
-    <url>https://github.com/KastenKlicker/SecureServerBackupLibrary</url>
+    <packaging>jar</packaging>
+    
+    <name>${project.groupId}:${project.artifactId}</name>
     <description>Core library to back up minecraft servers and upload the backup archives to a remote server.</description>
-
+    <url>https://github.com/KastenKlicker/SecureServerBackupLibrary</url>
+    
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>https://raw.githubusercontent.com/KastenKlicker/SecureServerBackupLibrary/refs/heads/master/LICENSE</url>
-            <distribution>repo</distribution>
+            <url>https://opensource.org/license/mit</url>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <name>KastenKlicker</name>
+            <email>kastenklicker@bigkek.de</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/KastenKlicker/SecureServerBackupLibrary</connection>
+        <developerConnection>scm:git:ssh://github.com/KastenKlicker/SecureServerBackupLibrary</developerConnection>
+    </scm>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
