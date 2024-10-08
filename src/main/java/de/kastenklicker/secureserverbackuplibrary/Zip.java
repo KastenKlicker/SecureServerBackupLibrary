@@ -13,6 +13,9 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Class for zipping the server files.
+ */
 public class Zip {
 
     private final ZipOutputStream zipOutputStream;
@@ -104,6 +107,7 @@ public class Zip {
 
     /**
      * Finish up the zip file
+     * @throws IOException OutputStream Exception.
      */
     public void finish() throws IOException {
         zipOutputStream.flush();

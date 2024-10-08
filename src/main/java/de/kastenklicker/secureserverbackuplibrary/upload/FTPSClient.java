@@ -32,9 +32,9 @@ public class FTPSClient extends UploadClient {
     }
 
     /**
-     * Method for uploading with FTPS
+     * Method for uploading with FTPS.
      * @param file Backup File
-     * @throws Exception FTPS & File related exceptions
+     * @throws Exception FTPS and File related exceptions
      */
     @Override
     public void upload(File file) throws Exception {

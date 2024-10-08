@@ -7,6 +7,9 @@ import java.io.File;
  */
 public class NullUploadClient extends UploadClient {
 
+    /**
+     * Constructor of Null Object class.
+     */
     public NullUploadClient() {
         super(null, 0, null, null, null);
     }
