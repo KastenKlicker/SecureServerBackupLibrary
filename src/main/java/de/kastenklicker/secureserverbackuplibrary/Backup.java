@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Class for containing all backup logic.
+ */
 public class Backup {
 
     private final List<String> excludeFiles;
@@ -21,7 +24,7 @@ public class Backup {
     private final long maxBackupDirectorySize;
 
     /**
-     * Class for containing all backup logic.
+     * Constructor for Backup class.
      * @param excludeFiles files which should be excluded from the backup
      * @param backupDirectory the directory of the backups
      * @param serverDirectory the directory which contains all server files

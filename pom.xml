@@ -7,16 +7,30 @@
     <groupId>de.kastenklicker</groupId>
     <artifactId>SecureServerBackupLibrary</artifactId>
     <version>1.0.0</version>
-    <url>https://github.com/KastenKlicker/SecureServerBackupLibrary</url>
+    <packaging>jar</packaging>
+    
+    <name>${project.groupId}:${project.artifactId}</name>
     <description>Core library to back up minecraft servers and upload the backup archives to a remote server.</description>
-
+    <url>https://github.com/KastenKlicker/SecureServerBackupLibrary</url>
+    
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>https://raw.githubusercontent.com/KastenKlicker/SecureServerBackupLibrary/refs/heads/master/LICENSE</url>
-            <distribution>repo</distribution>
+            <url>https://opensource.org/license/mit</url>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <name>KastenKlicker</name>
+            <email>sven.lange@hm.edu</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/KastenKlicker/SecureServerBackupLibrary</connection>
+        <url>https://github.com/KastenKlicker/SecureServerBackupLibrary/tree/main</url>
+    </scm>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -64,9 +78,10 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
+            <!-- Report plugins -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -81,6 +96,59 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.7.0</version>
+            </plugin>
+            <!-- maven central plugin -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+            <!-- source files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- java doc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.10.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- GPG signing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.7</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
