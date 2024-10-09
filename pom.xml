@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.kastenklicker</groupId>
-    <artifactId>SecureServerBackupLibrary</artifactId>
-    <version>1.0.0</version>
+    <artifactId>secure-server-backup-library</artifactId>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
     
     <name>${project.groupId}:${project.artifactId}</name>
@@ -105,6 +105,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
             <!-- source files -->
