@@ -38,13 +38,12 @@ public class SFTPClient extends UploadClient{
     }
 
     /**
-     * Method to upload file to sftp server
+     * Internal method to upload file to sftp server
      * @param backupFile file to upload
      * @throws JSchException Some exceptions
      * @throws SftpException Some exceptions
      */
-    @Override
-    public void upload(File backupFile)
+    protected void internalUpload(File backupFile)
             throws JSchException, SftpException, IOException {
         JSch jsch = new JSch();
         

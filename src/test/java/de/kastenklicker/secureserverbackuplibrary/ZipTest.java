@@ -4,8 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,11 +18,11 @@ public class ZipTest {
 
     static File testFile = new File(mainDirectory, "test.zip");
 
-    public ZipTest() throws FileNotFoundException {
+    public ZipTest() {
     }
 
     @Test
-    public void testZip() throws IOException {
+    public void testZip() {
 
         // Pack into zip
         File test = new File(mainDirectory, "test.txt");
@@ -36,7 +34,7 @@ public class ZipTest {
     }
 
     @Test
-    public void testZipFolder() throws IOException {
+    public void testZipFolder() {
 
         // Pack into zip
         File test = new File(mainDirectory, "testDir/testDir.txt");
@@ -48,7 +46,7 @@ public class ZipTest {
     }
 
     @Test
-    public void testZipExclude() throws IOException {
+    public void testZipExclude() {
 
         // Pack into zip
         ArrayList<String> excludeFiles = new ArrayList<>();

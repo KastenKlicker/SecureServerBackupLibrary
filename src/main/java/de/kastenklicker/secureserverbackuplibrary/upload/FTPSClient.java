@@ -11,6 +11,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.security.*;
 
@@ -32,12 +33,12 @@ public class FTPSClient extends UploadClient {
     }
 
     /**
-     * Method for uploading with FTPS.
+     * Internal method for uploading with FTPS.
      * @param file Backup File
-     * @throws Exception FTPS and File related exceptions
+     * @throws UploadException FTPS and File related exceptions
      */
     @Override
-    public void upload(File file) throws Exception {
+    protected void internalUpload(File file) throws IOException {
         ReuseableFTPSClient ftpsClient = new ReuseableFTPSClient();
         ftpsClient.connect(hostname, port);
         
