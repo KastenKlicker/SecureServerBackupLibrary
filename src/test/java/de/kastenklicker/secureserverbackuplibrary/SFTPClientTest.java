@@ -3,6 +3,7 @@ package de.kastenklicker.secureserverbackuplibrary;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import de.kastenklicker.secureserverbackuplibrary.upload.SFTPClient;
+import de.kastenklicker.secureserverbackuplibrary.upload.UploadException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,9 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +24,7 @@ public class SFTPClientTest {
     
     private static File privateHostKey;
     private static File publicHostKey;
+    private static final File TESTFILE = new File("./src/test/resources/zipTest/test.txt");
 
     private static String hostname;
     private static int port;
@@ -54,40 +58,38 @@ public class SFTPClientTest {
     }
     
     @Test
-    public void testUpload() throws JSchException, SftpException, IOException {
+    public void testUpload() throws IOException {
 
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
                 authentication, publicHostKey, timeout, remoteDirectory);
-
-        File testFile = new File("./src/test/resources/zipTest/test.txt");
-        sftpClient.upload(testFile);
+        
+        sftpClient.upload(TESTFILE);
         
         // Check if file was transferred correctly
         File testFileUpload = new File("./src/test/resources/testUpload.txt");
         sftpContainer.copyFileFromContainer("/home/foo/upload/test.txt", testFileUpload.getPath());
         assertEquals(-1L,
-                Files.mismatch(testFile.toPath(), testFileUpload.toPath()),
+                Files.mismatch(TESTFILE.toPath(), testFileUpload.toPath()),
                 "Uploaded and Download files are not the same");
         assertTrue(testFileUpload.delete());
     }
     
     @Test
-    public void testUploadScanHostKey() throws JSchException, SftpException, IOException {
+    public void testUploadScanHostKey() throws IOException {
         
         if (!publicHostKey.delete() && publicHostKey.exists())
             throw new RuntimeException("Couldn't run test, because publicHostKey file couldn't be deleted");
         
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
                 authentication, publicHostKey, timeout, remoteDirectory);
-
-        File testFile = new File("./src/test/resources/zipTest/test.txt");
-        sftpClient.upload(testFile);
+        
+        sftpClient.upload(TESTFILE);
 
         // Check if file was transferred correctly
         File testFileUpload = new File("./src/test/resources/testUpload.txt");
         sftpContainer.copyFileFromContainer("/home/foo/upload/test.txt", testFileUpload.getPath());
         assertEquals(-1L,
-                Files.mismatch(testFile.toPath(), testFileUpload.toPath()),
+                Files.mismatch(TESTFILE.toPath(), testFileUpload.toPath()),
                 "Uploaded and Download files are not the same");
         assertTrue(testFileUpload.delete());
     }
@@ -98,12 +100,35 @@ public class SFTPClientTest {
         final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
                 authentication, publicHostKey, timeout,  remoteDirectory + "/sus/kek");
 
-        Exception exception = assertThrows(SftpException.class, () ->
-                sftpClient.upload(
-                    new File("./src/test/resources/zipTest/test.txt"))
+        Exception exception = assertThrows(UploadException.class, () ->
+                sftpClient.upload(TESTFILE)
         );
 
-        assertTrue(exception.getMessage().contains("No such file"));
+        assertInstanceOf(SftpException.class, exception.getCause());
+    }
+    
+    @Test
+    public void testUploadWrongHost() {
+        final SFTPClient sftpClient = new SFTPClient("hostname", port, username,
+                authentication, publicHostKey, timeout, remoteDirectory);
+
+        Exception exception = assertThrows(UploadException.class, () ->
+                sftpClient.upload(TESTFILE)
+        );
+
+        assertInstanceOf(UnknownHostException.class, exception.getCause().getCause());
+    }
+    
+    @Test
+    public void testUploadNoLocalFile() {
+        final SFTPClient sftpClient = new SFTPClient(hostname, port, username,
+                authentication, publicHostKey, timeout, remoteDirectory);
+
+        Exception exception = assertThrows(UploadException.class, () ->
+                sftpClient.upload(new File("kek"))
+        );
+
+        assertInstanceOf(FileNotFoundException.class, exception.getCause().getCause());
     }
     
     @AfterAll
