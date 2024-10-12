@@ -20,6 +20,7 @@ public class Backup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("de.kastenklicker.secureserverlibrary");
 
+    private final List<String> includedFiles;
     private final List<String> excludeFiles;
     private final File backupDirectory;
     private final File serverDirectory;
@@ -28,13 +29,15 @@ public class Backup {
 
     /**
      * Constructor for Backup class.
+     * @param includedFiles files which should be included in backup
      * @param excludeFiles files which should be excluded from the backup
      * @param backupDirectory the directory of the backups
      * @param serverDirectory the directory which contains all server files
      * @param uploadClient the specific class of the Upload protocol
      * @param maxBackupDirectorySize the maximum size of the backup directory
      */
-    public Backup(List<String> excludeFiles, File backupDirectory, File serverDirectory, UploadClient uploadClient, long maxBackupDirectorySize) {
+    public Backup(List<String> includedFiles, List<String> excludeFiles, File backupDirectory, File serverDirectory, UploadClient uploadClient, long maxBackupDirectorySize) {
+        this.includedFiles = includedFiles;
         this.excludeFiles = excludeFiles;
         this.backupDirectory = backupDirectory;
         this.serverDirectory = serverDirectory;
@@ -51,11 +54,6 @@ public class Backup {
         // Append backup directory to excluded files list
         excludeFiles.add(backupDirectory.getName());
 
-        // Exclude session locks, because those are locked by paper
-        excludeFiles.add("world/session.lock");
-        excludeFiles.add("world_nether/session.lock");
-        excludeFiles.add("world_the_end/session.lock");
-
         // Get current time for backup file name
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -66,8 +64,9 @@ public class Backup {
         LOGGER.debug("Zipping files into {}.", backupFile.getName());
 
         // Compress the server files
-        Zip zip = new Zip(backupFile, serverDirectory, excludeFiles);
-        zip.zip(serverDirectory);
+        Zip zip = new Zip(backupFile, serverDirectory, includedFiles, excludeFiles);
+        for (File file : zip.getIncludedFiles())
+            zip.zip(file);
         zip.finish();
         
         LOGGER.debug("Finished zipping file.");
