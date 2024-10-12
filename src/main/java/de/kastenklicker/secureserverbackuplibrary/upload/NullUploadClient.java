@@ -15,5 +15,7 @@ public class NullUploadClient extends UploadClient {
     }
 
     @Override
-    protected void internalUpload(File file) {}
+    protected void internalUpload(File file) {
+        LOGGER.debug("NullUploadClient, nothing will be uploaded.");
+    }
 }

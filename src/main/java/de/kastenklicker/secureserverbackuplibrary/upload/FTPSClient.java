@@ -40,18 +40,22 @@ public class FTPSClient extends UploadClient {
     @Override
     protected void internalUpload(File file) throws IOException {
         ReuseableFTPSClient ftpsClient = new ReuseableFTPSClient();
+        LOGGER.debug("Connect to {}:{} via ftps.", hostname, port);
         ftpsClient.connect(hostname, port);
         
         // Set encryption parameters
+        LOGGER.debug("Set FTPS encryption up.");
         ftpsClient.execPBSZ(0);
         ftpsClient.execPROT("P");
         
         // Set connection parameters
+        LOGGER.debug("Log into FTPS server.");
         ftpsClient.login(username, authentication);
         ftpsClient.setFileType(FTP.LOCAL_FILE_TYPE);
         ftpsClient.enterLocalPassiveMode();
         
         // Upload file
+        LOGGER.debug("Uploading {} to FTPS server.", file.getName());
         FileInputStream fileInputStream = new FileInputStream(file);
         ftpsClient.changeWorkingDirectory(remoteDirectory);
         ftpsClient.storeFile(file.getName(), fileInputStream);

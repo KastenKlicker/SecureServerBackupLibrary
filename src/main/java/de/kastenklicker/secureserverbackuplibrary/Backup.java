@@ -2,6 +2,8 @@ package de.kastenklicker.secureserverbackuplibrary;
 
 import de.kastenklicker.secureserverbackuplibrary.upload.UploadClient;
 import de.kastenklicker.secureserverbackuplibrary.upload.UploadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -15,6 +17,8 @@ import java.util.List;
  * Class for containing all backup logic.
  */
 public class Backup {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("de.kastenklicker.secureserverlibrary");
 
     private final List<String> excludeFiles;
     private final File backupDirectory;
@@ -56,14 +60,17 @@ public class Backup {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
         LocalDateTime localDateTime = LocalDateTime.now();
         String currentTime = dateTimeFormatter.format(localDateTime);
-
+        
         // Create backup zip file
         File backupFile = new File(backupDirectory, "backup-"+currentTime+".zip");
+        LOGGER.debug("Zipping files into {}.", backupFile.getName());
 
         // Compress the server files
         Zip zip = new Zip(backupFile, serverDirectory, excludeFiles);
         zip.zip(serverDirectory);
         zip.finish();
+        
+        LOGGER.debug("Finished zipping file.");
         
         try {
             // Upload file
@@ -84,6 +91,7 @@ public class Backup {
                 throw new RuntimeException("Couldn't delete oldest backup: " + oldestFile);
             }
             files.removeLast();
+            LOGGER.debug("Removed oldest backup file {}.", oldestFile.getName());
         }
 
         return backupFile;

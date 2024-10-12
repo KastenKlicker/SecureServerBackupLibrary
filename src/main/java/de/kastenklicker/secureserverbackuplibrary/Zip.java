@@ -41,7 +41,7 @@ public class Zip {
                     try {
                         return new File(serverDirectory, path).getCanonicalPath();
                     } catch (IOException e) {
-                        LOGGER.debug("IOException occurred for: {}", path);
+                        LOGGER.debug("IOException occurred for excluded: {}", path);
                         return null;
                     }
                 }
@@ -53,7 +53,7 @@ public class Zip {
 
             zipOutputStream = new ZipOutputStream(fileOutputStream);
             zipOutputStream.setLevel(Deflater.DEFAULT_COMPRESSION);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ZipException(e);
         }
     }
@@ -101,7 +101,7 @@ public class Zip {
                 zipOutputStream.closeEntry();
                 fileInputStream.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ZipException(e);
         }
     }

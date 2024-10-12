@@ -50,6 +50,8 @@ public class SFTPClient extends UploadClient{
         // Scan for Host Key if file doesn't exist
         if (!publicHostKeyFile.exists()) {
 
+            LOGGER.warn("Couldn't find public host key of SFTP server. Retrieving it.");
+            
             // Get host key
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
@@ -67,12 +69,15 @@ public class SFTPClient extends UploadClient{
             BufferedWriter writer = new BufferedWriter(new FileWriter(publicHostKeyFile));
             writer.write(hostkey.getType() + " " + hostkey.getKey() + " " + hostkey.getComment());
             writer.close();
+            LOGGER.warn("Saved public host key to {}. This should happen just once.", publicHostKeyFile.getName());
         }
         
         // Check if the given String is the knownHosts file or a HostKey
         String hostKeyFileName = publicHostKeyFile.getName();
         if (hostKeyFileName.length() >= 4 &&    // File ist a public HostKey
                 hostKeyFileName.substring(hostKeyFileName.length() - 4).equalsIgnoreCase(".pub")) {
+
+            LOGGER.debug("Found public host key file.");
             // Add public hostKey            
             String keyString = Files.readString(publicHostKeyFile.toPath()).trim();
             
@@ -88,31 +93,38 @@ public class SFTPClient extends UploadClient{
             byte[] key = Base64.getDecoder().decode(keyString);
             HostKey hostKey = new HostKey(hostname, key);
             jsch.getHostKeyRepository().add(hostKey, null);
+            LOGGER.debug("Added public host key to HostKeyRepository.");
         }    
         else {  // File is a knownHosts file
             jsch.setKnownHosts(publicHostKeyFile.getPath());
+            LOGGER.debug("Added known hosts to HostKeyRepository.");
         }
             
-        
+        LOGGER.debug("Setting up SFTP session.");
         Session session = jsch.getSession(username, hostname, port);
         
         // If string is path, then use key authentication, else use password authentication
         if (new File(authentication).exists()) {
             jsch.addIdentity(authentication);
+            LOGGER.debug("Using private key for SFTP authentication.");
         } else {
+            LOGGER.debug("Using password key for SFTP authentication.");
             session.setPassword(authentication);
         }
 
+        LOGGER.debug("Connecting to SFTP server with a timeout of {} milliseconds.", timeout);
         session.connect(timeout);
         ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
 
         // Upload
         channelSftp.connect(timeout);
+        LOGGER.debug("Uploading {} to SFTP server.", backupFile.getName());
         channelSftp.put(backupFile.getPath(), remoteDirectory);
 
         // Disconnect
         channelSftp.exit();
         session.disconnect();
+        LOGGER.debug("Disconnected from {}.", hostname);
     }
 
 }

@@ -65,10 +65,12 @@ public abstract class UploadClient {
      * @throws UploadException Any sort of upload exception.
      */
     public void upload(File file) throws UploadException {
+        LOGGER.info("Start upload to {}", hostname);
         try {
             internalUpload(file);
         } catch (Exception e) {
             throw new UploadException(e);
         }
+        LOGGER.info("Finished uploading to {}", hostname);
     }
 }
