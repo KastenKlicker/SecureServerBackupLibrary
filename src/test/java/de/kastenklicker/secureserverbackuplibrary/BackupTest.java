@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,9 +32,10 @@ public class BackupTest {
     }
 
     @Test
-    public void testBackup() throws Exception {
+    public void testBackup() {
 
         assertTrue(new Backup(
+                List.of("."),
                 new ArrayList<>(),
                 backupsDirectory,
                 new File("./src/test/resources/zipTest"),
@@ -73,6 +75,7 @@ public class BackupTest {
                 "/upload");
         
         File backup = new Backup(
+                List.of("."),
                 new ArrayList<>(),
                 backupsDirectory,
                 new File("./src/test/resources/zipTest"),
@@ -110,6 +113,7 @@ public class BackupTest {
         assertTrue(new File("./src/test/resources/zipTest/backups/temporaryTestFile").exists());
 
         assertTrue(new Backup(
+                List.of("."),
                 new ArrayList<>(),
                 backupsDirectory,
                 new File("./src/test/resources/zipTest"),
