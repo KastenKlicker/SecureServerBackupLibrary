@@ -26,7 +26,7 @@ jobs:
           # -U force updates just to make sure we are using latest dependencies
           # -B Batch mode (do not ask for user input), just in case
           # -P activate profile
-          mvn -U -B clean deploy -P release
+          mvn -U -B clean deploy
         env:
           SIGN_KEY_PASS: ${{ secrets.GPG_KEY_PASSPHRASE }}
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
