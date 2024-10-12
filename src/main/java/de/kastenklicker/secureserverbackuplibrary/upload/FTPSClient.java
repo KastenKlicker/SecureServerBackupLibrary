@@ -11,6 +11,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.security.*;
 
@@ -32,25 +33,29 @@ public class FTPSClient extends UploadClient {
     }
 
     /**
-     * Method for uploading with FTPS.
+     * Internal method for uploading with FTPS.
      * @param file Backup File
-     * @throws Exception FTPS and File related exceptions
+     * @throws UploadException FTPS and File related exceptions
      */
     @Override
-    public void upload(File file) throws Exception {
+    protected void internalUpload(File file) throws IOException {
         ReuseableFTPSClient ftpsClient = new ReuseableFTPSClient();
+        LOGGER.debug("Connect to {}:{} via ftps.", hostname, port);
         ftpsClient.connect(hostname, port);
         
         // Set encryption parameters
+        LOGGER.debug("Set FTPS encryption up.");
         ftpsClient.execPBSZ(0);
         ftpsClient.execPROT("P");
         
         // Set connection parameters
+        LOGGER.debug("Log into FTPS server.");
         ftpsClient.login(username, authentication);
         ftpsClient.setFileType(FTP.LOCAL_FILE_TYPE);
         ftpsClient.enterLocalPassiveMode();
         
         // Upload file
+        LOGGER.debug("Uploading {} to FTPS server.", file.getName());
         FileInputStream fileInputStream = new FileInputStream(file);
         ftpsClient.changeWorkingDirectory(remoteDirectory);
         ftpsClient.storeFile(file.getName(), fileInputStream);

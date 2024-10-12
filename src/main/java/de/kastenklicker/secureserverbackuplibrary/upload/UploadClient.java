@@ -1,5 +1,8 @@
 package de.kastenklicker.secureserverbackuplibrary.upload;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 /**
@@ -7,6 +10,11 @@ import java.io.File;
  */
 public abstract class UploadClient {
 
+    /**
+     * SLF4J Logger
+     */
+    protected static final Logger LOGGER = LoggerFactory.getLogger("de.kastenklicker.secureserverlibrary");
+    
     /**
      * Hostname of remote server.
      */
@@ -45,9 +53,24 @@ public abstract class UploadClient {
     }
 
     /**
-     * Abstract method for uploading.
+     * Internal method for uploading.
      * @param file File to upload.
      * @throws Exception Any sort of upload exception.
      */
-    public abstract void upload(File file) throws Exception;
+    protected abstract void internalUpload(File file) throws Exception;
+
+    /**
+     * Abstract method for uploading.
+     * @param file File to upload.
+     * @throws UploadException Any sort of upload exception.
+     */
+    public void upload(File file) throws UploadException {
+        LOGGER.info("Start upload to {}", hostname);
+        try {
+            internalUpload(file);
+        } catch (Exception e) {
+            throw new UploadException(e);
+        }
+        LOGGER.info("Finished uploading to {}", hostname);
+    }
 }

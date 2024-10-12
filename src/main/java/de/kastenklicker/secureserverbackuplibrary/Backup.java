@@ -1,9 +1,11 @@
 package de.kastenklicker.secureserverbackuplibrary;
 
 import de.kastenklicker.secureserverbackuplibrary.upload.UploadClient;
+import de.kastenklicker.secureserverbackuplibrary.upload.UploadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,11 +18,12 @@ import java.util.List;
  */
 public class Backup {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger("de.kastenklicker.secureserverlibrary");
+
     private final List<String> excludeFiles;
     private final File backupDirectory;
     private final File serverDirectory;
     private final UploadClient uploadClient;
-    private List<String> missingFiles = new ArrayList<>();
     private final long maxBackupDirectorySize;
 
     /**
@@ -38,21 +41,12 @@ public class Backup {
         this.uploadClient = uploadClient;
         this.maxBackupDirectorySize = maxBackupDirectorySize;
     }
-
-    /**
-     * Get all files which shouldn't be included, but an error IOException occurred.
-     * @return Missing files list
-     */
-    public List<String> getMissingFiles() {
-        return missingFiles;
-    }
-
+    
     /**
      * Creates a backup with all files in the main directory expect the excluded ones.
      * @return Backup file
-     * @throws Exception Zip, Upload Exceptions - just everything
      */
-    public File backup() throws Exception {
+    public File backup() {
 
         // Append backup directory to excluded files list
         excludeFiles.add(backupDirectory.getName());
@@ -66,24 +60,30 @@ public class Backup {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
         LocalDateTime localDateTime = LocalDateTime.now();
         String currentTime = dateTimeFormatter.format(localDateTime);
-
+        
         // Create backup zip file
         File backupFile = new File(backupDirectory, "backup-"+currentTime+".zip");
+        LOGGER.debug("Zipping files into {}.", backupFile.getName());
 
         // Compress the server files
         Zip zip = new Zip(backupFile, serverDirectory, excludeFiles);
         zip.zip(serverDirectory);
         zip.finish();
-        missingFiles = zip.getMissingFiles();
-
-        // Upload file
-        uploadClient.upload(backupFile);
+        
+        LOGGER.debug("Finished zipping file.");
+        
+        try {
+            // Upload file
+            uploadClient.upload(backupFile);
+        } catch (Exception e) {
+            throw new UploadException(e);
+        }
 
         // Delete oldest file if over limit
         while (isOldestFileMarkedToBeDeleted()) {
             File[] fileArray = backupDirectory.listFiles();
             if (fileArray == null)
-                throw new FileNotFoundException(backupDirectory + " isn't a directory!");
+                throw new RuntimeException(backupDirectory + " isn't a directory!");
             ArrayList<File> files = new ArrayList<>(Arrays.asList(fileArray));
             files.sort(Comparator.comparing(File::lastModified));
             File oldestFile = files.getFirst();
@@ -91,6 +91,7 @@ public class Backup {
                 throw new RuntimeException("Couldn't delete oldest backup: " + oldestFile);
             }
             files.removeLast();
+            LOGGER.debug("Removed oldest backup file {}.", oldestFile.getName());
         }
 
         return backupFile;
