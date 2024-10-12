@@ -24,7 +24,7 @@ public class Backup {
     private final List<String> excludeFiles;
     private final File backupDirectory;
     private final File serverDirectory;
-    private final UploadClient uploadClient;
+    private final List<UploadClient> uploadClients;
     private final long maxBackupDirectorySize;
 
     /**
@@ -33,15 +33,15 @@ public class Backup {
      * @param excludeFiles files which should be excluded from the backup
      * @param backupDirectory the directory of the backups
      * @param serverDirectory the directory which contains all server files
-     * @param uploadClient the specific class of the Upload protocol
+     * @param uploadClients Array of UploadClients
      * @param maxBackupDirectorySize the maximum size of the backup directory
      */
-    public Backup(List<String> includedFiles, List<String> excludeFiles, File backupDirectory, File serverDirectory, UploadClient uploadClient, long maxBackupDirectorySize) {
+    public Backup(List<String> includedFiles, List<String> excludeFiles, File backupDirectory, File serverDirectory, List<UploadClient> uploadClients, long maxBackupDirectorySize) {
         this.includedFiles = includedFiles;
         this.excludeFiles = excludeFiles;
         this.backupDirectory = backupDirectory;
         this.serverDirectory = serverDirectory;
-        this.uploadClient = uploadClient;
+        this.uploadClients = uploadClients;
         this.maxBackupDirectorySize = maxBackupDirectorySize;
     }
     
@@ -73,7 +73,8 @@ public class Backup {
         
         try {
             // Upload file
-            uploadClient.upload(backupFile);
+            for (UploadClient uploadClient : uploadClients)
+                uploadClient.upload(backupFile);
         } catch (Exception e) {
             throw new UploadException(e);
         }

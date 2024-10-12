@@ -1,6 +1,5 @@
 package de.kastenklicker.secureserverbackuplibrary;
 
-import de.kastenklicker.secureserverbackuplibrary.upload.NullUploadClient;
 import de.kastenklicker.secureserverbackuplibrary.upload.SFTPClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +38,7 @@ public class BackupTest {
                 new ArrayList<>(),
                 backupsDirectory,
                 new File("./src/test/resources/zipTest"),
-                new NullUploadClient(),
+                new ArrayList<>(),
                 1)
                 .backup().exists());
     }
@@ -79,7 +78,7 @@ public class BackupTest {
                 new ArrayList<>(),
                 backupsDirectory,
                 new File("./src/test/resources/zipTest"),
-                uploadClient,
+                List.of(uploadClient),
                 1)
                 .backup();
         
@@ -117,7 +116,7 @@ public class BackupTest {
                 new ArrayList<>(),
                 backupsDirectory,
                 new File("./src/test/resources/zipTest"),
-                new NullUploadClient(),
+                new ArrayList<>(),
                 1)
                 .backup().exists());
 
